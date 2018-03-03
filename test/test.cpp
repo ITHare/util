@@ -48,14 +48,34 @@ static_assert( intuitive::lt(short(-1),(unsigned short)(1)) );
 static_assert( intuitive::lt(int64_t(-1), 1U) );
 static_assert( intuitive::lt(-1,uint64_t(1)) );
 static_assert( intuitive::le(-1,1U) );
+static_assert( intuitive::le(short(-1),(unsigned short)(1)) );
+static_assert( intuitive::le(int64_t(-1), 1U) );
+static_assert( intuitive::le(-1,uint64_t(1)) );
+static_assert( !intuitive::lt(1U,-1) );
+static_assert( !intuitive::lt((unsigned short)(1),short(-1)) );
+static_assert( !intuitive::lt( 1U,int64_t(-1)) );
+static_assert( !intuitive::lt(uint64_t(1),-1) );
+static_assert( !intuitive::le(1U,-1) );
+static_assert( !intuitive::le((unsigned short)(1),short(-1)) );
+static_assert( !intuitive::le( 1U,int64_t(-1)) );
+static_assert( !intuitive::le(uint64_t(1),-1) );
 
+static_assert( !intuitive::gt(-1,1U) );
+static_assert( !intuitive::gt(short(-1),(unsigned short)(1)) );
+static_assert( !intuitive::gt(int64_t(-1), 1U) );
+static_assert( !intuitive::gt(-1,uint64_t(1)) );
 static_assert( intuitive::gt(1U,-1) );
 static_assert( intuitive::gt((unsigned short)(1),short(-1)) );
 static_assert( intuitive::gt( 1U,int64_t(-1)) );
 static_assert( intuitive::gt(uint64_t(1),-1) );
 static_assert( intuitive::ge(1U,-1) );
+static_assert( intuitive::ge((unsigned short)(1),short(-1)) );
+static_assert( intuitive::ge( 1U,int64_t(-1)) );
+static_assert( intuitive::ge(uint64_t(1),-1) );
 
+static_assert( intuitive::eq(-1,long(-1)) );
 static_assert( !intuitive::eq(-1,unsigned(-1)) );
+static_assert( !intuitive::ne(-1,(long long)(-1)) );
 static_assert( intuitive::ne(-1,unsigned(-1)) );
 
 const lest::test specification[] = {
