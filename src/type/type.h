@@ -96,11 +96,14 @@ inline constexpr bool lt(TA a, TB b) {
     }
     else { //last resort: expression 
 	  ITHARE_UTIL_ASSERT(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
-      if constexpr(aSigned)
-        return a<0 ? true : TUNSIGNED(a) < b;
+      if constexpr(aSigned) {
+        //return a<0 ? true : TUNSIGNED(a) < b;
+        return (a<0) | (TUNSIGNED(a) < b);//sic - single '|', seems to perform better under GCC (avoids branch)
+	  }
       else {
         ITHARE_UTIL_ASSERT(bSigned);
-        return b<0 ? false : a < TUNSIGNED(b);
+        //return b<0 ? false : a < TUNSIGNED(b);
+        return (b>=0) & (a < TUNSIGNED(b));//sic - single '&', seems to perform better under GCC (avoids branch)
       }
     }
   }
@@ -114,7 +117,7 @@ inline constexpr bool eq(TA a, TB b) {
   constexpr bool aSigned = std::is_signed<TA>::value;
   constexpr bool bSigned = std::is_signed<TB>::value;
   if constexpr(aSigned == bSigned)
-    return a < b;//both signed or both unsigned - no casts required, C promotions will do just fine
+    return a == b;//both signed or both unsigned - no casts required, C promotions will do just fine
   else {//different is_signed, let's make TSIGNED always-signed, and TUNSIGNED - always-unsigned
     using TSIGNED = typename select_type<aSigned,TA,TB>::type;
     using TUNSIGNED = typename select_type<aSigned,TB,TA>::type;
