@@ -35,8 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 #include <type_traits>
-//#include <assert.h> internal debug only
-#define assert(x)
+#ifdef ITHARE_UTIL_INTERNAL_DEBUG
+#include <assert.h> internal debug only
+#define ITHARE_UTIL_ASSERT(x) assert(x)
+#else
+#define ITHARE_UTIL_ASSERT(x)
+#endif
 
 namespace ithare { namespace util { namespace type {
 
@@ -81,21 +85,21 @@ inline constexpr bool lt(TA a, TB b) {
     if constexpr(sizeof(TUNSIGNED)<sizeof(MAX_EFFICIENT_INT)) {
       //we can cast unsigned to MAX_EFFICIENT_INT
       if constexpr(aSigned) {
-        assert(!bSigned);
+        ITHARE_UTIL_ASSERT(!bSigned);
         return a < MAX_EFFICIENT_INT(b);
       }
       else {
-        assert(bSigned);
+        ITHARE_UTIL_ASSERT(bSigned);
         return MAX_EFFICIENT_INT(a) < b; 
       } 
      
     }
     else { //last resort: expression 
-	  assert(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
+	  ITHARE_UTIL_ASSERT(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
       if constexpr(aSigned)
         return a<0 ? true : TUNSIGNED(a) < b;
       else {
-        assert(bSigned);
+        ITHARE_UTIL_ASSERT(bSigned);
         return b<0 ? false : a < TUNSIGNED(b);
       }
     }
@@ -126,20 +130,20 @@ inline constexpr bool eq(TA a, TB b) {
     if constexpr(sizeof(TUNSIGNED)<sizeof(MAX_EFFICIENT_INT)) {
       //we can cast unsigned to MAX_EFFICIENT_INT
       if constexpr(aSigned) {
-        assert(!bSigned);
+        ITHARE_UTIL_ASSERT(!bSigned);
         return a == MAX_EFFICIENT_INT(b);
       }
       else {
-        assert(bSigned);
+        ITHARE_UTIL_ASSERT(bSigned);
         return MAX_EFFICIENT_INT(a) == b; 
       } 
     }
     else { //last resort: expression
-	  assert(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
+	  ITHARE_UTIL_ASSERT(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
       if constexpr(aSigned)
         return a<0 ? false : TUNSIGNED(a) == b;
       else {
-        assert(bSigned);
+        ITHARE_UTIL_ASSERT(bSigned);
         return b<0 ? false : a == TUNSIGNED(b);
       }
     }
