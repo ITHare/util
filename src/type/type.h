@@ -56,7 +56,7 @@ namespace intuitive {
   using MAX_EFFICIENT_INT = intptr_t;//platform-dependent, but intptr_t is not a bad starting point
 									 //  if it is suboptimal for some platform - open an issue, we'll add an #ifdef for that platform 
 
-//DUPLICATED CODE (1/3). It is obviously possible to get rid of duplicates, 
+//DUPLICATED CODE (1/2). It is obviously possible to get rid of duplicates, 
 //                       but it is currently unclear how it may affect performance of the compiled code, so for now we prefer it this way 
 template<class TA, class TB>
 inline constexpr bool lt(TA a, TB b) {
@@ -102,52 +102,7 @@ inline constexpr bool lt(TA a, TB b) {
   }
 }
 
-
-//DUPLICATED CODE (2/3)
-template<class TA, class TB>
-inline constexpr bool gt(TA a, TB b) {
-  static_assert(std::is_integral<TA>::value);
-  static_assert(std::is_integral<TB>::value);
-  constexpr bool aSigned = std::is_signed<TA>::value;
-  constexpr bool bSigned = std::is_signed<TB>::value;
-  if constexpr(aSigned == bSigned)
-    return a < b;//both signed or both unsigned - no casts required, C promotions will do just fine
-  else {//different is_signed, let's make TSIGNED always-signed, and TUNSIGNED - always-unsigned
-    using TSIGNED = typename select_type<aSigned,TA,TB>::type;
-    using TUNSIGNED = typename select_type<aSigned,TB,TA>::type;
- 
-    static_assert(sizeof(TSIGNED)+sizeof(TUNSIGNED)==sizeof(TA)+sizeof(TB));//self-check
-    if constexpr(sizeof(TSIGNED)>sizeof(TUNSIGNED))
-      return a > b;//again, no casts required, C promotions will do just fine (promoting b to TA which is signed)
-    if constexpr(sizeof(TUNSIGNED)<sizeof(int)) {
-      return a > b;//again, no casts required, C promotion-to-int will do just fine (promoting both to int which is signed) 
-    } 
-     
-    //at this point, we have sizeof(TUNSIGNED) >= sizeof(TSIGNED) => no-cast will be counterintuitive
-    if constexpr(sizeof(TUNSIGNED)<sizeof(MAX_EFFICIENT_INT)) {
-      //we can cast unsigned to MAX_EFFICIENT_INT
-      if constexpr(aSigned) {
-        assert(!bSigned);
-        return a > MAX_EFFICIENT_INT(b);
-      }
-      else {
-        assert(bSigned);
-        return MAX_EFFICIENT_INT(a) > b; 
-      } 
-    }
-    else { //last resort: expression
-	  assert(sizeof(TUNSIGNED)>=sizeof(TSIGNED));
-      if constexpr(aSigned)
-        return a<0 ? false : TUNSIGNED(a) > b;
-      else {
-        assert(bSigned);
-        return b<0 ? true : a > TUNSIGNED(b);
-      }
-    }
-  }
-}
-
-//DUPLICATED CODE (3/3)
+//DUPLICATED CODE (2/2)
 template<class TA, class TB>
 inline constexpr bool eq(TA a, TB b) {
   static_assert(std::is_integral<TA>::value);
@@ -192,8 +147,13 @@ inline constexpr bool eq(TA a, TB b) {
 }
 
 template<class TA, class TB>
+inline constexpr bool gt(TA a, TB b) {
+	return lt(b,a);
+}
+
+template<class TA, class TB>
 inline constexpr bool le(TA a, TB b) {
-	return !gt(a,b);
+	return !lt(b,a);
 }
 
 template<class TA, class TB>
