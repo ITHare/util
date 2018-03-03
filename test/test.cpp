@@ -63,11 +63,13 @@ const lest::test specification[] = {
 int main(int argc, char** argv) {
 	std::cout << OUT_SIZEOF(short) << " " << OUT_SIZEOF(int) << " " << OUT_SIZEOF(int64_t) << std::endl;
 
+#ifdef WARNINGS_EXPECTED
 	std::cout << OUT_CMP( int(-1) < unsigned(1) ) << std::endl;
 	std::cout << OUT_CMP( -1 < 1U ) << std::endl;
 	std::cout << OUT_CMP( short(-1) < (unsigned short)(1) ) << std::endl;
 	std::cout << OUT_CMP( int64_t(-1) < unsigned(1) ) << std::endl;
 	std::cout << OUT_CMP( int(-1) < uint64_t(1) ) << std::endl;
+#endif
 
 	std::cout << OUT_CMP( intuitive::lt(int(-1),unsigned(1)) ) << std::endl;
 	std::cout << OUT_CMP( intuitive::lt(-1,1U) ) << std::endl;
