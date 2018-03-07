@@ -43,18 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 namespace ithare { namespace util { namespace type {
-
-template<bool which, class T, class T2>
-struct select_type;
- 
-template<class T, class T2>
-struct select_type<true, T, T2> {
-  using type = T;
-};
-template<class T, class T2>
-struct select_type<false, T, T2> {
-  using type = T2;
-};
  
 namespace intuitive {
   using MAX_EFFICIENT_INT = intptr_t;//platform-dependent, but intptr_t is not a bad starting point
@@ -71,8 +59,8 @@ inline constexpr bool lt(TA a, TB b) {
   if constexpr(aSigned == bSigned)
     return a < b;//both signed or both unsigned - no casts required, C promotions will do just fine
   else {//different is_signed, let's make TSIGNED always-signed, and TUNSIGNED - always-unsigned
-    using TSIGNED = typename select_type<aSigned,TA,TB>::type;
-    using TUNSIGNED = typename select_type<aSigned,TB,TA>::type;
+    using TSIGNED = typename std::conditional<aSigned,TA,TB>::type;
+    using TUNSIGNED = typename std::conditional<aSigned,TB,TA>::type;
  
     static_assert(sizeof(TSIGNED)+sizeof(TUNSIGNED)==sizeof(TA)+sizeof(TB));//self-check
     if constexpr(sizeof(TSIGNED)>sizeof(TUNSIGNED))
@@ -119,8 +107,8 @@ inline constexpr bool eq(TA a, TB b) {
   if constexpr(aSigned == bSigned)
     return a == b;//both signed or both unsigned - no casts required, C promotions will do just fine
   else {//different is_signed, let's make TSIGNED always-signed, and TUNSIGNED - always-unsigned
-    using TSIGNED = typename select_type<aSigned,TA,TB>::type;
-    using TUNSIGNED = typename select_type<aSigned,TB,TA>::type;
+    using TSIGNED = typename std::conditional<aSigned,TA,TB>::type;
+    using TUNSIGNED = typename std::conditional<aSigned,TB,TA>::type;
  
     static_assert(sizeof(TSIGNED)+sizeof(TUNSIGNED)==sizeof(TA)+sizeof(TB));//self-check
     if constexpr(sizeof(TSIGNED)>sizeof(TUNSIGNED))
